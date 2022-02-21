@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
+  <link rel="stylesheet" href="./index.css">
+</head>
+<body>
+  
+ <div id='all' class="container">
+    <div class="row">
+      <div class="col s12 m4"></div>
+      <div class="col s12 m4 center"><h1>Coding Quiz</h1></div>
+      <div  class="col s12 m4"></div>
+    </div>
+    <div class="row startRow valign-wrapper">
+      <div class="col s12 m4"></div>
+      <div class="col s12 m4 center ">
+    
+        <a id="start" class="waves-effect waves-light btn">Start</a>
+       
+      </div>
+      <div class="col s12 m4"></div>
+     
+
+     
+
+    </div>
+    <div id="scoreSubmit" class="row hidden">
+      <div class="input-field col s12">
+        <input placeholder="initials" id="initials" type="text" class="myInput">
+        <label for="first_name">Iniitals</label>
+      </div>
+    <a id="submit" class="waves-effect waves-light btn center ">submit</a>
+    </div>
+    <div class="row">
+      <div id="timer" class="col s12 m6 hidden">30</div>
+      <div id="score" class="col s12 m6"></div>
+    </div>
+    <div class="row">
+    <div id="questionBox" class="col s12 m6"></div>
+    <div id="optionBox" class="col s12 m6"></div>
+    </div>
+    <div id="displayScores" class="row"></div>
+
+   
+   
+    </div>
+
+
+
+
+
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+
+  <script>
+    let currentQuestion = 0
+    let score = 0
+    let time = 30
+    let questions = [
+      {
+        question: "how do you declare a variable in JS?",
+        options: ["const or let", "int", "string"],
+        answer: "const or let"
+      },
+      {
+        question: "what does html stand for?",
+        options: ["hyper text markup language", "hotmail"],
+        answer: "hyper text markup language"
+      }
+    ]
+
+    const displayQuestion = () => {
+      renderScore()
+      
+      document.getElementById('questionBox').innerHTML = `
+      <p> ${questions[currentQuestion].question} </p>
+      `
+      document.getElementById('optionBox').innerHTML = `
+      <p data-option=${questions[currentQuestion].options[0]}
+      data-answer=${questions[currentQuestion].answer}
+      class="option"> ${questions[currentQuestion].options[0]} 
+      </p>
+       <p data-option=${questions[currentQuestion].options[1]}
+       data-answer=${questions[currentQuestion].answer}
+       class="option"> ${questions[currentQuestion].options[1]} </p>
+      `
+    }
+
+    const wrongAnswer = () => {
+      console.log('wrong answer!')
+      time -= 5
+
+      if(time<0) {
+        document.getElementById('all').innerHTML = `
+        <h1> YOU LOSE! YOU GET NOTHING!</h1>
+        `
+      }
+    }
+
+    const timer = () => {
+      time -= 1
+      document.getElementById('timer').innerHTML = `${time}`
+      if (time < 0) {
+        document.getElementById('all').innerHTML = `
+        <h1> YOU LOSE! YOU GET NOTHING!</h1>
+        `
+      }
+    }
+
+    const renderScore = () => {
+      document.getElementById("score").innerHTML = `${score}`
+    }
+
+    const finishQuiz = () => {
+      document.getElementById('questionBox').innerHTML = ''
+      document.getElementById('optionBox').innerHTML = ''
+      document.getElementById('scoreSubmit').classList.remove('hidden')
+      clearTimeout(clearTime)
+
+    }
+
+    document.getElementById('submit').addEventListener('click', event => {
+      let newScore = {
+        initials: document.getElementById('initials').value,
+        score: time
+      }
+      if(localStorage.getItem('scores')) {
+        let scores = JSON.parse(localStorage.getItem('scores'))
+        scores.push(newScore)
+        localStorage.setItem('scores', JSON.stringify(scores))
+      } else {
+        let scores = []
+        scores.push(newScore)
+        localStorage.setItem('scores', JSON.stringify(scores))
+        
+      }
+      
+      document.getElementById('scoreSubmit').innerHTML = ''
+      let scores = JSON.parse(localStorage.getItem('scores'))
+      scores.forEach(score => {
+        document.getElementById('displayScores').innerHTML += `
+        <h4> ${score.initials} </h4>
+        <h5> ${score.score} </h5>
+        <hr> </hr>
+        `
+      })
+    })
+    
+
+   
+    let clearTime
+    document.getElementById("start").addEventListener("click", event => {
+      renderScore()
+      document.getElementById('timer').classList.remove('hidden')
+      clearTime = setInterval(timer, 1000)
+      displayQuestion()
+    })
+
+    document.addEventListener('click', event => {
+      if(event.target.classList.contains('option')) {
+      
+      
+      if(event.target.dataset.option === event.target.dataset.answer) {
+        console.log('correct!')
+        currentQuestion += 1
+        score += 1
+        renderScore()
+        if(currentQuestion === questions.length) {
+          finishQuiz()
+        } else {
+            displayQuestion()
+        }
+      
+      } else {
+    
+        wrongAnswer()
+      }
+    }
+    })
+    
+    
+  </script>
+</body>
+</html>

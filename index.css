@@ -1,0 +1,20 @@
+body {
+  background-color: #BDBF09;
+}
+
+.row {
+  background-color: #2292A4;
+}
+
+.startRow {
+  height: 10vh;
+  text-align: center;
+}
+
+.hidden {
+  display: none;
+}
+
+.myInput {
+  color: black;
+}
